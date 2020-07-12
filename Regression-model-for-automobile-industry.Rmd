@@ -3,8 +3,8 @@ title: "Regression-model-for-automobile-industry"
 author: "luis"
 date: "11/7/2020"
 output:
-  pdf_document: default
   html_document: default
+  pdf_document: default
 ---
 
 ```{r setup, include=FALSE}
@@ -19,6 +19,7 @@ This project consists on a regression model for analysis of a data collection of
   2. Quantify the MPG difference between automatic and manual transmissions
   
 The data contains a set of 32 observations on 11 different variables
+
 -	mpg:	Miles/(US) gallon
 -	cyl:	Number of cylinders
 -	disp:	Displacement (cu.in.)
@@ -87,6 +88,7 @@ In the QQ plot we can see there is no special pattern for the residuals, also th
 ## Conclusions
 
 This model states that if given the other vairables constant (qsec: 1/4 mile time, wt: Weight(1000 lbs)), the Miles/gallon (mpg) for the transmissions is:
+
 - Automatic: 9.6178 + 0*(2.9358) = 9.6178 Miles/Gallon
 - Manual: 9.6178 + 1*(2.9358) = 12.5536 Miles/Gallon
 Concluding, the manual transmission is better  for Miles/Gallon, with a 2.9358 Miles/Gallon difference with a constant weight and 1/4 mile time.
