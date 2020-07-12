@@ -1,0 +1,92 @@
+---
+title: "Regression-model-for-automobile-industry"
+author: "luis"
+date: "11/7/2020"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Description
+
+This project consists on a regression model for analysis of a data collection of automobile industry. The main objectivo is to explore the relationship between a set of variables and miles per gallon (MPG). Particularly in the answer of the following questions:
+
+  1. Is an automatic or manual transmission better for MPG
+  2. Quantify the MPG difference between automatic and manual transmissions
+  
+The data contains a set of 32 observations on 11 different variables
+-	mpg:	Miles/(US) gallon
+-	cyl:	Number of cylinders
+-	disp:	Displacement (cu.in.)
+-	hp:	Gross horsepower
+-	drat:	Rear axle ratio
+-	wt:	Weight (1000 lbs)
+-	qsec:	1/4 mile time
+-	vs:	Engine (0 = V-shaped, 1 = straight)
+-	am:	Transmission (0 = automatic, 1 = manual)
+-	gear:	Number of forward gears
+-	carb:	Number of carburetors
+
+
+## Data and libraries loading
+
+The libraries and set of data are loaded
+```{r , message = F, warning = F}
+library(ggplot2)
+library(dplyr)
+data("mtcars")
+```
+
+
+## Exploratory Data Analyses
+
+A first aproximation is made by the boxplot that differentiates the automatic and manual transmissions.
+```{r }
+boxplot(mpg ~ am, data = mtcars, xlab = "Transmission (Automatic = 0, Manual = 1)", ylab = "Miles/gallon", main = "Miles/gallon for manual and automatic transmissions")
+```
+
+The boxplot shows the manual transmission has in general greater values (mean = 24.39) for Miles/Gallon (mpg) than automatic transmissions (mean = 17.14). Nevertheless, the range of values is bigger for the manual transmission.
+
+## Model Selection
+
+For the model selection, a first guess is made by fitting all the variables in the dataframe in order to look the diagnostics and decide whicho ones are needed.
+```{r}
+allData <- mtcars %>% mutate(cyl = as.factor(cyl), vs = as.factor(vs), am = as.factor(am), gear = as.factor(gear), carb = as.factor(carb))
+fitAllData <- lm(mpg ~ ., data = allData)
+summary(fitAllData)
+```
+
+The model shows a residual standard error of 2.833 on 15 degrees of freedom. The R-squared value 0.8931 indicates 89.3% of the data is explained by this model. Nevertheless, none of the variables show significant values less than 5%.
+
+The followed procedure was to find the most insignificant variable in data set and remove it. The line "which.max(summary(*model*)$coef[, 4])" can find the least significant variable. The process was repeated until all the variables in the model resulted significant.
+
+```{r}
+dataBetter <- allData %>% select(-cyl); fitBetter <- lm(mpg ~ ., data = allData)
+dataBetter <- dataBetter %>% select(-carb); fitBetter <- lm(mpg ~ ., data = dataBetter)
+dataBetter <- dataBetter %>% select(-gear); fitBetter <- lm(mpg ~ ., data = dataBetter)
+dataBetter <- dataBetter %>% select(-vs); fitBetter <- lm(mpg ~ ., data = dataBetter)
+dataBetter <- dataBetter %>% select(-drat); fitBetter <- lm(mpg ~ ., data = dataBetter)
+dataBetter <- dataBetter %>% select(-disp); fitBetter <- lm(mpg ~ ., data = dataBetter)
+dataBetter <- dataBetter %>% select(-hp); fitBetter <- lm(mpg ~ ., data = dataBetter)
+summary(fitBetter)
+```
+
+After the process is concluded, the final model shows a residual standard error of 2.459 on 28 degrees of freedom. Even though we removed 8 variables of the data out of 11 initial variables, the R-squared value is 0.8497 so the 84.97% of the data variance is still explained with all the variables show significance values less than 5%. The p-value indicates that we fail to reject the null hypothesis.
+
+```{r}
+par(mfrow = c(2, 2))
+plot(fitBetter)
+```
+
+In the QQ plot we can see there is no special pattern for the residuals, also the standarized and theoretical residuals have a good correlation.
+
+## Conclusions
+
+This model states that if given the other vairables constant (qsec: 1/4 mile time, wt: Weight(1000 lbs)), the Miles/gallon (mpg) for the transmissions is:
+- Automatic: 9.6178 + 0*(2.9358) = 9.6178 Miles/Gallon
+- Manual: 9.6178 + 1*(2.9358) = 12.5536 Miles/Gallon
+Concluding, the manual transmission is better  for Miles/Gallon, with a 2.9358 Miles/Gallon difference with a constant weight and 1/4 mile time.
